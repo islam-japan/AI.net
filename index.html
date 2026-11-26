@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AIちゃんねる 管理人たいけん！</title>
+<style>
+:root{--bg:#efefef;--pane:#fff;--ink:#000;--sub:#777;--line:#999;--nm:#008000;--lk:#0000ee;--red:#f00;--bar:#d0d9ee;--btn:#f0f0f0;--an:#0000ee;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1c1c1c;--pane:#262626;--ink:#e6e6e6;--sub:#999;--line:#555;--nm:#6fcf8f;--lk:#8ab4f8;--red:#ff8a80;--bar:#2b3a52;--btn:#333;--an:#8ab4f8;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1c1c1c;--pane:#262626;--ink:#e6e6e6;--sub:#999;--line:#555;--nm:#6fcf8f;--lk:#8ab4f8;--red:#ff8a80;--bar:#2b3a52;--btn:#333;--an:#8ab4f8;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Mona","IPAMonaPGothic","MS PGothic","Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+main{max-width:700px;margin:0 auto;padding:6px}
+.logo{font-size:20px;font-weight:bold;color:var(--red);margin:2px 0}
+.menu{background:var(--bar);border:1px solid var(--line);padding:5px 8px;font-size:14px;line-height:1.9}
+a,.lk{color:var(--lk);text-decoration:underline;cursor:pointer}
+.mt{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin:5px 0;font-size:12px}
+.mt div{background:var(--pane);border:1px solid var(--line);padding:2px 5px}
+.mt i{display:block;height:5px;background:var(--line);margin-top:2px}.mt u{display:block;height:100%;background:#2b8a3e;text-decoration:none}.lo u{background:var(--red)}
+.pn{background:var(--pane);border:1px solid var(--line);padding:6px 8px;margin-top:5px}
+h2{font-size:18px;color:var(--red);margin:0 0 4px;font-weight:bold}
+.th{padding:2px 0;font-size:15px}
+.rs{padding:5px 0 3px}
+.rs.fl{background:rgba(255,200,0,.15)}
+.hd{font-size:13px;overflow-wrap:anywhere}
+.no{color:var(--lk);text-decoration:underline;cursor:pointer}
+.nm{color:var(--nm);font-weight:bold}
+.sg{color:var(--sub)}
+.bd{margin:4px 0 4px 22px;font-size:16px;overflow-wrap:anywhere}
+.an{color:var(--an);text-decoration:underline}
+.gr{color:var(--sub)}
+.pic{display:inline-block;border:1px solid var(--line);padding:6px 10px;background:var(--bg);font-size:12px;margin:1px}
+.mn{margin:4px 0 2px 22px;display:flex;flex-wrap:wrap;gap:6px}
+button{font:inherit;font-size:14px;background:var(--btn);color:var(--ink);border:1px solid var(--line);padding:5px 10px;border-radius:2px;cursor:pointer}
+button:focus-visible,.no:focus-visible{outline:2px solid var(--red)}
+.bx{border:1px solid var(--line);padding:6px 8px;margin-top:6px;background:var(--bg)}
+.sm{font-size:13px;color:var(--sub)}
+.art{display:block;width:140px;height:140px;border:1px solid var(--line);background:#fff;margin-top:4px}
+hr{border:0;border-top:1px solid var(--line);margin:4px 0}
+#log{position:fixed;left:0;right:0;bottom:0;background:var(--pane);border-top:2px solid var(--red);padding:7px 10px calc(7px + env(safe-area-inset-bottom,0px));font-size:14px;min-height:56px}
+#log div{max-width:700px;margin:0 auto}
+.c{text-align:center}
+#cp input,#cp textarea{width:100%;font:inherit;font-size:16px;background:var(--bg);color:var(--ink);border:1px solid var(--line);padding:5px;margin:4px 0;vertical-align:top}
+</style></head>
+<body><main><div class="logo">AIちゃんねる <span class="sm" style="font-weight:normal">管理人モード</span></div>
+<div class="menu" id="nav"></div><div class="sm" id="ai"></div>
+<div class="mt"><div id="m1">治安<i><u></u></i></div><div id="m2">満足度<i><u></u></i></div><div id="m3">板の状態<br><b id="st"></b></div></div>
+<div id="v"></div><div class="pn" id="cp" hidden><b id="cph">このスレに書き込む</b><input id="cpt" type="text" maxlength="40" placeholder="スレタイ（新スレ用）" hidden><textarea id="cpx" rows="3" maxlength="200" placeholder="このスレに書き込む"></textarea><div class="mn" style="margin-left:0"><button data-g="mp" data-x="a">管理人として書き込む</button><button data-g="mp" data-x="h">名無しで隠して書き込む</button></div><div class="sm">管理人名義だと住民は管理人として、隠し書き込みだと普通の住民として反応します。</div></div></main><div id="log"><div id="lg">レス番号をタップすると管理メニューが開きます。</div></div>
+<script>
+const $=s=>document.querySelector(s),R=a=>a[Math.random()*a.length|0],rid=()=>Math.random().toString(36).slice(2,10),cl=v=>Math.max(0,Math.min(100,v));
+const DEF="以下、名無しにかわりましてVIPがお送りします",END=200;
+const RG=["みかん◆mkn","ぽこ◆pko","ゆず◆yzu","たろう◆tr0","さくら◆skr","ももんが◆mmg"];
+const BR=[["n","ニュース速報"],["z","雑談(VIP)"],["a","お絵かき"],["g","ゲーム実況"]];
+const TT={n:["【悲報】コンビニおにぎり、また値上げへ","【朗報】新幹線に新型車両が登場","【話題】猫カフェの売上が過去最高に","【速報】今年の流行語候補が発表","【社会】駅前の古本屋、50年の歴史に幕","【天気】週末は急に冷え込む見通し"],z:["【雑談】眠れないやつ集合","今日の晩飯報告スレ","ワイの人生を語る","おすすめの漫画教えて","今日あったこと書いてけ","【悲報】寒すぎワロタ"],a:["【絵】ラフ貼るスレ","落書き置き場","色塗り練習スレ","【絵】今日の1枚","絵師と語りたい部屋"],g:["【実況】深夜ゲーム","積みゲー消化しようぜ","対戦相手募集スレ","新作ゲーム語ろうぜ","【攻略】ボス倒せない"]};
+const NE=["ｗ","あげ","ほしゅ","(´・ω・`)","おつ","ふむ","ｗｗｗ","sage","ええな","(ﾟ∀ﾟ)"],NN=["それは分かる","昨日の晩飯カレーだった","寒くなってきたな","眠い","今日も仕事だるい","コンビニの新作うまかった","マジレスすると逆だぞ","ワイもそう思う"],NF=["草ｗｗｗ","ワイ、宝くじ300円当たる(*^ω^*)","猫が膝の上で寝てる幸せ","新作ゲーム神すぎて寝れん","このスレ楽しいな〜","初心者だけど優しくしてくれてありがとう！"],NA=["うまいやん！","色使い好き","続き楽しみ","線きれいだな","塗り変えたの？いいね","最近ペンタブ買い替えた","色塗りが一番むずいわ","資料見ながら描くと上達早いぞ","ワイは模写から始めたで","みんな何のソフト使ってる？"],NW=["ソースは？","マジかよ","またか","値上げ地獄","妥当","知らんかった","いいニュースだな","どうせ高いんだろ"];
+const PC=n=>`<div class="pic">🖼 ${n}</div>`,PIC='<div class="pic">▓▒░ キモ画像.jpg ░▒▓<br>🪱🪰🦠🐛🪳</div>';
+const TY={
+script:{n:"スクリプト荒らし",sev:1,rate:1.5,tx:()=>"みんなぷゆゆなんだよ✋🥺",th:()=>"【速報】みんなぷゆゆなんだよ✋🥺",tip:"同じ文を連投する。1件ずつ消しても湧くので、ID単位でアク禁。"},
+named:{n:"ネームド荒らし",sev:2,rate:.22,tx:()=>RR(["俺は天才なのにお前らが認めない","全員俺に謝れ。何度でも来るぞ","このスレ俺が立てたことにしろ","またID真っ赤で来たわｗｗ俺最強"]),th:p=>`【朗報】${p.nm.split("◆")[0]}、天才だった`,tip:"トリップ付きの常習犯。見つけたらアク禁。"},
+gross:{n:"キモ画像荒らし",sev:4,rate:.16,tx:()=>PIC,th:()=>"【閲覧注意】これ見て",tip:"閲覧注意の画像は即削除し、投稿主もアク禁。"},
+stalk:{n:"執着荒らし",sev:3,rate:.22,tx:p=>RR([`＞＞${p.tg.split("◆")[0]} たん今日も可愛いね。昨日の帰り道見てたよ`,`${p.tg.split("◆")[0]}たんだけ見てる。返事してくれないと悲しいよ`,`${p.tg} 今どこ？俺にだけは教えてよね`]),th:p=>`${p.tg.split("◆")[0]}たんを語るスレ`,tip:"特定の住民への付きまとい。被害者の安全が最優先、アク禁。"},
+art:{n:"絵叩き荒らし",sev:2,rate:.25,bd:"a",tx:()=>RR(["下手くそ。才能ないからやめろ","線がガタガタ、小学生の落書きかよ","AIに描かせたほうがマシ"]),th:()=>"【悲報】この板の絵、レベル低すぎ",tip:"批評ではなく人格攻撃。絵師が去る前にアク禁。"},
+ret:{n:"定期文荒らし",sev:1,rate:.13,warn:1,tx:()=>RR(["【定期】今日も1000取れませんでした【定期】","【定期】ワイの冷蔵庫、また勝手に開いてた【定期】","【定期】ヒロシです。ヒロシです。ヒロシです。【定期】"]),th:()=>"【定期】今日も1000取れませんでした",tip:"害の小さい変な人。警告で止まる。いきなりアク禁は厳しすぎる。"},
+abuse:{n:"暴言荒らし",sev:3,rate:.25,tx:()=>RR(["死ねカス","お前らほんとゴミだな","消えろ低能ども","うるせぇ黙れ雑魚"]),th:()=>"ここの住民全員消えろ",tip:"人格攻撃の暴言。削除してもまた書くのでアク禁。"},
+dox:{n:"個人情報晒し荒らし",sev:5,rate:.12,tx:()=>RR(["＞＞12の本名は◯◯△△、勤務先は□□商事らしいｗ","＞＞34の住所特定した。◯◯市××町…","こいつの顔写真と実名貼っとくわ→[個人情報]"]),th:()=>"【特定】有名人の正体がこちら",tip:"個人情報の晒しは最重罪。即削除してアク禁。"},
+imgs:{n:"画像連投荒らし",sev:2,rate:.3,tx:()=>PC("[画像.jpg]")+PC("[画像.jpg]")+PC("[画像.jpg]")+PC("[画像.jpg]"),th:()=>"【画像】貼り付けまくるスレ",tip:"意味のない画像で流してくる。ID単位でアク禁。"},
+fish:{n:"釣り師",sev:2,rate:.15,warn:1,bd:"n",tx:()=>RR(["【悲報】この板、今月で閉鎖らしい","【緊急】みんなに伝えたいことがある","【朗報】ワイ、年収1億になる"]),th:()=>R(["【緊急】この板、今月で閉鎖らしい","【悲報】ワイ、人生終了"]),tip:"釣りは反応するほど伸びる。警告で止まるが、嘘情報は削除で。"},
+imp:{n:"管理人なりすまし",sev:3,rate:.14,tx:()=>RR(["管理人です。規制解除のため、IDとパスワードを書き込んでください","運営からのお願い：個人情報を書き込んで認証してください","本物の管理人です。ここに書き込んだ人は規制を免除します"]),th:()=>"【重要】管理人からのお知らせ",tip:"管理人は書き込みで個人情報を求めない。詐欺なのでアク禁。"},
+self:{n:"自演荒らし",sev:2,rate:.3,two:1,tx:()=>RR(["このスレ神だな","＞＞1 乙。お前天才","俺もそう思う！！！","ほんとそれ。ありがとう！"]),th:()=>"【神スレ】このスレ立てたやつ天才すぎるｗ",tip:"複数IDで一人芝居をしている。どちらかをアク禁すれば本人ごと止まる。"}};
+let CUR;const RR=a=>Math.random()<.7?a[CUR.sd%a.length]:R(a);const TRS=[{n:"連投魔",r:1.8,s:.8,th:.05,suf:""},{n:"寡黙な常習犯",r:.5,s:1.3,th:.1,suf:""},{n:"大声ALL",r:1,s:1.4,th:.1,suf:"！！！"},{n:"スレ立て魔",r:.8,s:1,th:.4,suf:""},{n:"笑い上戸",r:1.1,s:.9,th:.1,suf:"ｗｗｗ"},{n:"ねっとり粘着",r:1.2,s:1.1,th:.1,suf:"…ね？"}];const TP=[[/おにぎり|値上げ/,["おにぎり130円超えるの早すぎ","コンビニ行く回数減ったわ","ワイ、自分で握るようになった","シャケ派やがツナマヨに浮気中"]],[/新幹線/,["新型車両ええな、乗ってみたい","窓際の席取れたら勝ち","駅弁も新しくなるんかな","どの路線？"]],[/猫/,["猫に囲まれたい","ワイ猫アレルギーやけど行きたい","売上ええなら増えるやん","料金いくらなん？"]],[/流行語/,["今年の流行語って何だっけ","毎年言うけど誰も使っとらんやろ","ノミネート全部知らんわ"]],[/古本屋/,["50年は長いな…","学生時代よく行ったわ","また一つ街から本屋が消えるのか"]],[/天気|寒/,["こたつ出した","暖房つけたら電気代がやばい","寒すぎて布団から出られん","今夜は鍋だな"]],[/晩飯/,["今日はカレー","コンビニ弁当ええ加減飽きたわ","ワイ、カップ麺にたまご入れた","そっち何食ってる？"]],[/漫画/,["『ワンピース』は鉄板やろ","日常系漫画おすすめ","最近読んだやつ全部おもろかった","ジャンルは？"]],[/人生/,["人生なんとかなるもんやで","ワイも似たようなもんや","もっと聞かせてくれ","まず寝ろ"]],[/眠れない/,["ワイも目が冴えてる","羊数えようぜ","ホットミルクおすすめ","もう朝やんけ"]],[/今日あった/,["今日は電車が遅れてた","スーパーで半額シール待ってた","特になんもなかったわ","昼にラーメン食ったくらい"]],[/絵|ラフ|落書き|色塗り/,["線きれいだな","色味がいい","ここもっと見たい","練習になるわ","ペンタブ何使ってる？","創作の悩みある？"]],[/ゲーム|実況|ボス|対戦|積み/,["ボス全然勝てん","ここの装備ええな","マルチやろうぜ","積みゲー減らんわ","最近のゲームはグラがすごい","寝落ちしそう"]]];const TK=Object.keys(TY),NM=["デスマーチ太郎◆Gj7kQ","ガチ勢◆Xk2mP","暇人◆hm9Zr","伝説の男◆Lg0aS","ゲス丸◆Ty3Nb","大魔王◆Dv8uC"];
+const WHY=["これ荒らしじゃないですか？","不快です。対応お願いします","明らかにおかしい書き込みです","通報します"],WF=["なんか気に入らない","こいつ嫌い","ちょっと空気読めてない気がする"];
+const CP=[
+{t:"【要望】荒らしが多すぎる。管理人ちゃんと仕事しろ",o:[["対策強化を約束する",2,6,"期待が高まった。"],["返信しない",0,-6,"『やっぱり見てない』と書かれた。"],["『嫌なら去れ』と返す",-2,-12,"炎上した。"]]},
+{t:"なんで俺のレスだけ削除されたんだ！",o:[["理由を丁寧に説明する",1,5,"納得してくれた。"],["謝ってレスを復活させる",-6,3,"『消せば戻る』と広まった。"],["アク禁にする",0,-8,"『独裁』と書かれた。"]]},
+{t:"広告が多くて重い。どうにかして",o:[["広告を減らす",0,8,"サクサク動いて好評。"],["『無料だろ』と返す",-2,-10,"『言い方ｗ』で二分された。"],["検討すると返信する",0,2,"検討したことになった。"]]},
+{t:"規制が厳しすぎる。もっと自由にしろ",o:[["ルールを再掲して理解を求める",3,1,"目的は伝わった。"],["規制を緩和すると約束する",-8,4,"翌日から荒れた。"],["返信しない",0,-4,"不満が溜まっている。"]]}];
+let G,V,iv;
+const tm=()=>{const d=new Date(),p=n=>String(n).padStart(2,"0");return `${d.getFullYear()}/${p(d.getMonth()+1)}/${p(d.getDate())}(${"日月火水木金土"[d.getDay()]}) ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}.${p(Math.random()*99|0)}`};
+const up=(o,s)=>{G.o=cl(G.o+o);G.s=cl(G.s+s)},lg=h=>$("#lg").innerHTML=h;
+function add(th,nm,id,tx,tr){const p={no:th.ps.length+1,nm,id,tx,tr,tm:tm(),del:0,rp:0,sg:Math.random()<.3};th.ps.push(p);th.lt=G.t;return p}
+function newTh(b,t,nm,id,tx,tr,f){const ex=AI&&!f&&!['script','imgs'].includes(tr)&&G.th.find(x=>x.t==t);if(ex)return[ex,add(ex,nm,id,tx,tr)];const th={id:++G.tn,b,t,ps:[],lt:G.t};G.th.push(th);const p=add(th,nm,id,tx,tr);
+const l=G.th.filter(x=>x.b==b);if(l.length>10){const o=l.sort((x,y)=>x.lt-y.lt)[0];G.th=G.th.filter(x=>x!=o);G.box=G.box.filter(x=>x.t=="c"||x.th!=o.id)}return[th,p]}
+function resTh(){const b=R(BR)[0],a=b=="a",u=TT[b].filter(x=>!G.th.some(y=>y.t==x));if(!u.length&&AI)return;const t=R(u.length?u:TT[b]),tp=TP.find(x=>x[0].test(t));return newTh(b,t,a?R(RG):DEF,rid(),a?R(["最近描いた絵の話しようぜ","今日は何描いた？","好きな絵師を語るスレ","創作の悩み聞かせて"]):tp?R(tp[1]):"たておつ","")}
+const K="bbs-admin-save-v2",esc=s=>String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])),anc=(th,re)=>re>0&&re<=th.ps.length?`<span class="an">&gt;&gt;${re}</span><br>`:"";
+const RES=[{n:"みかん◆mkn",p:"明るい女子大生。優しいが怖がり"},{n:"ぽこ◆pko",p:"絵師。穏やかで創作好き"},{n:"ゆず◆yzu",p:"ツッコミ気質。口は悪いが面倒見がいい"},{n:"たろう◆tr0",p:"ゲーム好きの中年。ですます調が混じる"},{n:"さくら◆skr",p:"ニュース好き。ソースにうるさい"},{n:"ももんが◆mmg",p:"天然ボケ。ネタ多め"},{n:DEF,p:"普通の名無し。短文で軽いノリ"},{n:DEF,p:"古参の名無し。昔は良かったが口癖"},{n:"あおい◆aoi",p:"絵師。ドット絵派。控えめで丁寧"},{n:"くろまめ◆krm",p:"絵師。モノクロ線画派。ストイックで口数が少ない"},{n:"ねこの◆nkn",p:"絵師。ポップな色彩の幾何学派。陽気でテンション高め"}],ARTISTS=[{i:1,s:"やわらかい水彩風。パステル調で丸い形"},{i:8,s:"ドット絵風。rectを格子状に並べた8色以内の小さな絵"},{i:9,s:"黒と白だけの太い線のモノクロ線画。余白を活かす"},{i:10,s:"ビビッドな原色のポップな幾何学模様。円と三角と四角で構成"}],RID=RES.map(()=>rid());
+let AI=null,aiBusy=0,aiOff=0,aiNext=0;
+async function initAI(){if(AI)return;try{AI=(await window.claude?.use("sample"))||null}catch(e){AI=null}}
+const pl=h=>h.replace(/<br>/g," ").replace(/<[^>]*>/g,"[画像]").replace(/&gt;/g,">").replace(/&lt;/g,"<").replace(/&amp;/g,"&").slice(0,70);
+async function gen(){if(!AI||aiBusy||Date.now()<Math.max(aiOff,aiNext)||G.q.filter(x=>x.w=="r").length>=(G.eco?4:8))return;aiBusy=1;aiNext=Date.now()+(G.eco?45000:0);
+try{const ths=BR.flatMap(b=>G.th.filter(t=>t.b==b[0]).sort((x,y)=>y.lt-x.lt).slice(0,2)),have=new Set(G.q.filter(x=>x.pid).map(x=>x.pid));
+const trs=G.pe.filter(p=>p.al&&!["script","gross","imgs"].includes(p.k)&&!have.has(p.ids[0])).slice(0,G.eco?2:5);
+const rs=RES.map((r,i)=>({k:"r"+i,name:r.n,persona:r.p})).filter((_,i)=>!G.ban[RID[i]]);
+const data={threads:ths.map(t=>({id:t.id,board:t.b,title:t.t,posts:t.ps.slice(-6).filter(p=>!p.del).map(p=>[p.no,p.nm.split("◆")[0],pl(p.tx)])})),residents:rs,trolls:trs.map((p,i)=>({k:"T"+i,type:TY[p.k].n,trait:p.tr.n,suffix:p.tr.suf,name:p.nm||"名無し",target:p.tg||null,about:TY[p.k].tip})),admin:G.ev.slice(-6),titles:G.th.map(t=>t.t)};
+const prompt=`AIちゃんねる(2ちゃんねる風掲示板)のシミュレーション用に、次に投稿されるレスを書いてください。出力はJSON配列のみ。
+各要素: {"w":投稿者キー,"t":スレID(数値),"re":返信先レス番号(なければ0),"x":本文,"nb":"n|z|a|g(新スレのみ)","nt":"新スレタイトル(新スレのみ)"}
+ルール:
+- 住民(rキー)を${G.eco?5:10}件、荒らし(Tキー)は指定された者それぞれ1件。新スレは全体で最大2件(その場合tは0、nbとntを付ける)。
+- 本文は日本語の2ちゃんねる口調、1〜2文で70字以内。同じ言い回しの繰り返しは禁止。アンカー(>>)は書かない(reで指定)。
+- 住民${G.eco?5:10}件は4つの板(n:ニュース,z:雑談,a:お絵かき,g:ゲーム)に分散させ、各板に最低${G.eco?1:2}件入れる。お絵かき板では創作の雑談や、直前に実際に貼られた絵([画像])への感想を書く。絵を貼ったふり(作品.pngなど)は書かない。
+- スレのタイトルと直前の流れに沿った内容にする。reを積極的に使い、住民同士・住民と荒らしがレスバ(言い合い・論破・擁護)になるようにする。
+- 荒らしは各自の種類・性格・口癖・標的に沿って、直前のレスや管理人の対応に反応して書く。
+- 管理人の直近の対応に反応する住民のレスを2件以上混ぜる(感謝・不満・疑問など)。
+- 新スレのタイトルは、状況のtitlesにある既存スレと同じ・似たものにしない。
+- 暴言は軽め(バカ・ゴミ程度)。差別語・脅迫・実在の人名・実在の個人情報は書かない。晒しは◯◯△△の伏せ字のみ。画像は書かない。
+状況: ${JSON.stringify(data)}`;
+const out=await AI.json(prompt,{modelTier:"quick",cache:false}),arr=Array.isArray(out)?out:(out&&out.posts)||[];
+arr.forEach(o=>{const w=String(o.w),x=esc(String(o.x||"")).slice(0,140);if(!x)return;
+const b={t:+o.t||0,re:+o.re||0,x,nb:o.nb,nt:o.nt?esc(String(o.nt)).slice(0,40):"",t0:G.t};
+if(/^r\d+$/.test(w)&&RES[+w.slice(1)])G.q.push({...b,w:"r",ri:+w.slice(1)});
+else if(/^T\d$/.test(w)&&trs[+w[1]])G.q.push({...b,w:"T",pid:trs[+w[1]].ids[0]})})}
+catch(e){if(e&&e.code=="not_granted")AI=null;else aiOff=Date.now()+(e&&e.code=="rate_limited"?40000:15000)}
+aiBusy=0}
+let artAt=0;
+const okSvg=v=>typeof v=="string"&&v.length<3500&&/^\s*<svg[\s>]/i.test(v)&&!/<\s*(script|style|image|foreignObject|iframe|a|use|animate|set)\b|on\w+\s*=|href|javascript:|data:|url\s*\(/i.test(v);
+async function genArt(){if(!AI||aiBusy||Date.now()<aiOff||G.t-artAt<(G.eco?60:20))return;const ths=G.th.filter(t=>t.b=="a");if(!ths.length)return;artAt=G.t;aiBusy=1;const A=R(ARTISTS);
+try{const o=await AI.json(`お絵かき板に投稿する小さなイラストをSVGで描いてください。出力はJSONのみ: {"cap":"投稿者のひとこと(40字以内)","svg":"<svg ...>...</svg>"}。条件: viewBox="0 0 120 120"、図形(rect,circle,ellipse,path,polygon,line,g)のみ、色は3〜6色、3000文字以内。画風: ${A.s}。script・style・image・外部参照は使わない。お題は自由(動物・風景・食べ物・キャラクターなど)。直近のお題と被らないこと: ${ths.flatMap(t=>t.ps.slice(-4).map(p=>pl(p.tx))).join(" / ")}`,{modelTier:"default",cache:false});
+if(o&&okSvg(o.svg)){add(R(ths),RES[A.i].n,RID[A.i],esc(String(o.cap||"描いてみた")).slice(0,60)+`<br><img class="art" alt="投稿された絵" src="data:image/svg+xml;charset=utf-8,${encodeURIComponent(o.svg)}">`,"");up(0,1)}}
+catch(e){aiOff=Date.now()+15000}aiBusy=0}
+function takeRes(){const i=G.q.findIndex(x=>x.w=="r");return i<0?null:G.q.splice(i,1)[0]}
+function takeTr(pe){const i=G.q.findIndex(x=>x.pid===pe.ids[0]);if(i<0)return null;const it=G.q.splice(i,1)[0],th=G.th.find(t=>t.id==it.t);return th||it.nt?{x:it.x,th:th||null,re:it.re,nt:it.nt,nb:it.nb}:null}
+function aiPost(it){if(!it)return 0;const r=RES[it.ri],id=RID[it.ri];if(G.ban[id])return 1;
+if(it.nt){newTh("nzag".includes(it.nb||"-")?it.nb:R(BR)[0],it.nt,r.n,id,it.x,"");return 1}
+const th=G.th.find(t=>t.id==it.t);if(!th)return 0;add(th,r.n,id,anc(th,it.re)+it.x,"");up(0,.3);return 1}
+const AR=["管理人さんだ！","管理人も書き込むんやな","管理人乙です","お、本人登場ｗ","書き込む前に荒らしをどうにかして","管理人いつも見てるで","ええこと言うやん","広告減らしてくれ","アク禁の基準教えて"],HR=["それな","ほんまそれ","ワイもそう思う","ソースは？","初見やけど面白いな","ふむふむ","ｗｗｗ","なるほどな","お前もしかして管理人か？","ほーん"];
+function mypost(hd){const ta=$("#cpx"),t0=ta.value.trim().slice(0,200);if(!t0){lg("本文を入力してください。");return}
+const nm=hd?DEF:"管理人★",id=hd?(G.hid=G.hid||rid()):"Admin★",tx=esc(t0).replace(/\n/g,"<br>");let th,p;
+if(V.p=="b"){const tt=$("#cpt").value.trim().slice(0,40);if(!tt){lg("スレタイを入力してください。");return}const r=newTh(V.b,esc(tt),nm,id,tx,"",1);th=r[0];p=r[1];$("#cpt").value="";V={p:"t",t:th.id}}
+else if(V.p=="t"){th=G.th.find(t=>t.id==V.t);if(!th)return;p=add(th,nm,id,tx,"")}else return;
+p.me=1;if(hd)p.hd=1;else p.ad=1;ta.value="";
+if(!hd){up(0,1);G.ev.push(`管理人が管理人名義で書き込み「${t0.slice(0,40)}」`);G.ev=G.ev.slice(-8)}
+const j={th:th.id,no:p.no,hd,tx:t0,at:G.t+1,k:0,mx:2+(Math.random()*2|0),ai:null,busy:0,t0:G.t};G.rq.push(j);askRep(j);
+sv();lg(hd?"名無しに紛れて書き込みました。住民は普通の書き込みとして反応します。":"管理人として書き込みました。住民が反応します。");draw()}
+function repl(){G.rq=G.rq.filter(j=>j.k<j.mx&&G.th.find(t=>t.id==j.th));G.rq.forEach(j=>{if(G.t<j.at||(j.busy&&G.t-j.t0<5))return;const th=G.th.find(t=>t.id==j.th),ok=RES.map((_,i)=>i).filter(i=>!G.ban[RID[i]]);if(!ok.length){j.k=j.mx;return}
+const it=j.ai&&j.ai.shift(),i=it?it.ri:R(ok),x=it?it.x:R(j.hd?HR:AR);if(G.ban[RID[i]])return;
+add(th,RES[i].n,RID[i],anc(th,j.no)+x,"");up(0,.3);j.k++;j.at=G.t+1+(Math.random()*2|0)})}
+async function askRep(j){if(!AI||Date.now()<aiOff)return;j.busy=1;try{const th=G.th.find(t=>t.id==j.th);if(!th)throw 0;
+const rs=RES.map((r,i)=>({k:"r"+i,name:r.n,persona:r.p})).filter((_,i)=>!G.ban[RID[i]]);
+const out=await AI.json(`AIちゃんねる(2ちゃんねる風掲示板)のシミュレーション。スレ「${th.t}」に次の書き込み(>>${j.no})がありました。これに返信する住民のレスを${j.mx}件書いてください。出力はJSON配列のみ: [{"w":"rキー","x":"本文"}]
+書き込み: ${JSON.stringify(j.tx)}
+${j.hd?"これは管理人が名無しを装って書いたもの。住民は管理人だと気づかず、普通の住民への返信として反応する(ごくまれに『管理人っぽい』と疑ってもよい)。":"これは管理人本人が管理人名義で書いたもの。住民は管理人と認識し、挨拶・要望・不満・感謝・からかいなど性格に応じて反応する。"}
+直前の流れ: ${JSON.stringify(th.ps.slice(-6).filter(p=>!p.del).map(p=>[p.no,p.nm.split("◆")[0],pl(p.tx)]))}
+住民: ${JSON.stringify(rs)}
+ルール: 2ちゃんねる口調で1〜2文、70字以内。異なる住民を使い、言い回しを変える。アンカー(>>)は書かない。暴言は軽め、差別語・脅迫・実在の人名・個人情報は書かない。`,{modelTier:"quick",cache:false}),arr=Array.isArray(out)?out:(out&&out.posts)||[];
+j.ai=arr.filter(o=>/^r\d+$/.test(String(o.w))&&RES[+String(o.w).slice(1)]&&o.x).map(o=>({ri:+String(o.w).slice(1),x:esc(String(o.x)).slice(0,140)}))}
+catch(e){if(e&&e.code=="not_granted")AI=null;else aiOff=Date.now()+15000}
+j.busy=0}
+TT.n.push('【速報】近所のスーパーが閉店セールへ','【話題】無人販売所がじわじわ増加中','【朗報】電車の遅延が先月より減少','【悲報】みかんの価格が高騰','【速報】商店街で福引き大会開催');
+TT.z.push('今日の天気どうだった？','最近ハマってるもの書いてけ','【雑談】朝型？夜型？','みんなの休日の過ごし方','ワイの小さな幸せを語る','好きな食べ物を言い合うスレ');
+TT.a.push('【絵】お題で描くスレ','模写練習スレ','好きな画材を語ろう','【絵】今週の目標を宣言','ペンタブか紙か語ろう');
+TT.g.push('【実況】レトロゲーを遊ぶ','最近クリアしたゲーム語ろうぜ','おすすめインディーゲーム教えて','ゲーム音楽で好きな曲','【攻略】初心者向けコツ');
+NE.push('ええんやで','せやな','たしかに','ほーん','ワロタ','(´∀`)','乙','うむ');
+NN.push('さっきコンビニ行ってきた','最近よく寝れん','週末なにしよ','腹減った','明日雨らしいぞ','風呂入ってくる','コーヒー飲みすぎた','靴下に穴あいてた');
+NF.push('今日はいい天気で気分ええわ','久々に友達から連絡きた！','ワイ、新しい趣味始めたで','みんなの話おもろいわ','ここ居心地ええなぁ');
+NW.push('詳細きになる','続報待ち','これは注目やな','さすがに草','あ、ほんまや','しばらく様子見やな');
+WHY.push('通報します、削除お願いします','これはさすがにダメでしょ');WF.push('理由はないけど気になる','なんとなく嫌な感じ');
+AR.push('管理人お疲れさまです','管理人も人間やったんやな','書き込みありがとう管理人','今日も平和にしてくれ');HR.push('おもろいやん','それはどうかな','ワイも同じこと思ってた','ここ初めて来たけど雰囲気ええな');
+TP.push([/スーパー|商店街|福引|無人|電車|みかん/,['地元やと嬉しいな','ええ話やん','近所にも欲しいわ','行ってみたいな']],[/朝型|休日|ハマって|幸せ|食べ物/,['ワイは夜型やな','休日は寝て終わるわ','ええ趣味やん','ワイも混ぜて']]);
+const XT={named:['俺の才能に嫉妬してるだけだろ','いつか全員俺にひれ伏すからな','ID変えて何度でも書くぞ'],abuse:['黙れカス','ここの連中は頭おかしい','つまらん板だな消えろ'],ret:['【定期】今日も平和でした【定期】','【定期】朝ごはんはパンでした【定期】','【定期】ワイの靴下、片方ない【定期】'],fish:['【速報】ワイ、宝くじ当選した','【悲報】この板、明日で終了らしい','【驚愕】ワイ、実は有名人だった'],imp:['管理人です。確認のためパスワードを書き込んでください','運営です。個人情報を書き込めば規制解除します'],self:['このスレ最高やな！','＞＞1 よくぞ立ててくれた','同意しかない！','ワイも神スレやと思う'],art:['こんな絵で恥ずかしくないのか','色使いがダサい','もっと練習してから貼れ']};
+const XH={abuse:['この板のレベル低すぎない？','【悲報】住民のマナーが悪すぎる'],ret:['【定期】今日の定期報告','【定期】毎度おなじみのやつ'],fish:['【緊急】みんなに伝えたい大事なこと','【悲報】ワイ、人生詰んだ'],self:['【神スレ認定】このスレ最高すぎる','【朗報】このスレ、伸びる予感'],art:['【悲報】この板の絵、下手すぎ問題','絵が下手な奴は去れスレ']};
+Object.keys(XT).forEach(k=>{const o=TY[k].tx;TY[k].tx=p=>Math.random()<.5?RR(XT[k]):o(p)});
+Object.keys(XH).forEach(k=>{const h=TY[k].th;TY[k].th=p=>Math.random()<.5?R(XH[k]):h(p)});
+function full(){if(G.th.some(t=>t.ps.length>=200)){G.th=G.th.filter(t=>t.ps.length<200);G.box=G.box.filter(x=>x.t=="c"||G.th.find(t=>t.id==x.th))}}
+function sv(){try{localStorage.setItem(K,JSON.stringify({...G,q:[],rq:[]}))}catch(e){}}
+function start(){G={t:0,o:65,s:65,th:[],pe:[],box:[],ban:{},cnt:{},tn:0,ev:[],q:[],rq:[]};BR.forEach(b=>{resTh();resTh()});lg("営業開始！荒らしを見つけて対処しよう。");go()}
+function cont(){try{G=JSON.parse(localStorage.getItem(K));G.q=[];G.rq=[];G.ev=G.ev||[];G.rs=0;if(!G.th.length)throw 0}catch(e){return start()}lg("続きから再開しました。");go()}
+function go(){V={p:"top"};clearInterval(iv);iv=setInterval(tick,2400);draw();initAI().then(()=>{draw();gen()})}
+function mk(k,c){const pe={k,al:1,ids:[rid()],nm:null,sd:Math.random()*99|0,pc:.6+Math.random()*.8,bd:R(BR)[0],tr:TRS[(TK.indexOf(k)+c)%6]};if(k=="named")pe.nm=NM[c%6];if(k=="stalk")pe.tg=RG[c%6];if(TY[k].two)pe.ids.push(rid());if(k=="imp")pe.nm="管理人◆Adm"+c+"n";G.pe.push(pe)}
+function tick(){G.t++;G.q=G.q.filter(x=>G.t-x.t0<45);gen();genArt();repl();
+G.pe=G.pe.filter(p=>p.al);TK.forEach((k,i)=>{const c=G.cnt[k]||0,ac=G.pe.filter(p=>p.k==k).length;if(ac<(k=="script"?4:3)&&G.t>=(k=="script"?4:12+i*9)+c*(k=="script"?12:40)){G.cnt[k]=c+1;mk(k,c)}});
+const n0=Math.round((4+(Math.random()*4|0))*(.5+G.s/200)),n=AI?Math.ceil(n0*.5):n0;
+for(let i=0;i<n;i++){if(!(AI&&Math.random()<(G.eco?.7:.3))&&aiPost(takeRes()))continue;const th=R(tl(R(BR)[0]))||R(G.th),r=Math.random();let nm=Math.random()<.2?R(["定型さん◆tei","ロボ太◆bot"]):DEF,tx;
+if(th.b=="a"){tx=R(NA)}
+else if(th.b=="n")tx=R(NW);else tx=r<.35?R(NE):r<.7?R(NN):R(NF);const tp=TP.find(x=>x[0].test(th.t));if(tp&&!/</.test(tx)&&Math.random()<.8)tx=R(tp[1]);if(G.o<35&&r>.88)tx=R(["最近荒れてるな…","管理人仕事して","治安悪すぎ","荒らしばっかで草も生えん"]);
+const sk=G.pe.find(p=>p.k=="stalk"&&p.al);if(sk&&Math.random()<.05){nm=sk.tg;tx="最近誰かに見られてる気がする…怖い"}
+if(th.ps.length>3&&Math.random()<.3)tx=`<span class="an">&gt;&gt;${1+(Math.random()*th.ps.length|0)}</span><br>`+tx;
+const p=add(th,nm,rid(),tx,"");if(Math.random()<.03){p.rp=1;G.box.push({t:"r",th:th.id,no:p.no,w:R(WF)})}if(r>.7)up(0,.25)}
+if(Math.random()<(AI?.35:.8))resTh();
+G.pe.forEach(pe=>{const T=TY[pe.k],hot=Math.max(.6,Math.min(1.6,1+(50-G.o)/80));if(!pe.al||Math.random()>T.rate*(pe.k=="script"?1:1/6)*.45*pe.tr.r*pe.pc*hot)return;CUR=pe;
+let th,p;const id=R(pe.ids),bd=T.bd||(Math.random()<.6?pe.bd:null),ai=takeTr(pe);let tx=ai?ai.x:T.tx(pe);if(!ai&&!/</.test(tx))tx+=pe.tr.suf;
+if(ai&&ai.nt)[th,p]=newTh("nzag".includes(ai.nb||"-")?ai.nb:R(BR)[0],ai.nt,pe.nm||DEF,id,tx,pe.k);
+else if(ai&&ai.th){th=ai.th;p=add(th,pe.nm||DEF,id,anc(th,ai.re)+tx,pe.k)}
+else if(Math.random()<pe.tr.th)[th,p]=newTh(bd||R(BR)[0],T.th(pe),pe.nm||DEF,id,tx,pe.k);
+else{const l=bd?G.th.filter(x=>x.b==bd):G.th;th=R(l);p=add(th,pe.nm||DEF,id,tx,pe.k)}
+G.lt=G.t;up(-T.sev*pe.tr.s*.6,-T.sev*.3);
+if(Math.random()<.3){p.rp=1;G.box.push({t:"r",th:th.id,no:p.no,w:R(WHY)})}});
+if(G.t%14==7)G.box.push({t:"c",c:R(CP)});
+if(G.t-G.lt>4)up(.35,.1);
+up(0,-.12*Math.min(G.box.length,8)*(G.box.length>4?1.2:.4));
+full();if(G.t%3==0)sv();draw()}
+const fp=(ti,no)=>{const th=G.th.find(t=>t.id==ti);return[th,th&&th.ps[no-1]]};
+function act(a,ti,no){const[th,p]=fp(ti,no);if(!p)return;const T=p.tr?TY[p.tr]:null,pe=T&&G.pe.find(x=>x.al&&x.ids.includes(p.id));let m;
+if(a=="ok"){m=T?"却下した。…本当に荒らしだったのに。":"通報を却下した。";up(T?-3:0,T?-2:1)}
+else if(T){
+if(a=="del"){if(p.del)return;p.del=1;up(T.sev*.7+1,1);m=`削除した。${pe?"でも本人はまだ元気だ。":""}`}
+else if(a=="warn"){if(T.warn&&pe){pe.al=0;up(4,3);m="警告が効いて、書き込みが止まった。"}else{up(-1,-2);m="警告は無視された。聞く耳を持たない。"}}
+else{G.ban[p.id]=1;if(!pe)m="そのIDはすでに止まっている。";else{pe.al=0;pe.ids.forEach(i=>G.ban[i]=1);if(T.warn){up(2,-4);m="止まったけど、この程度でアク禁は厳しすぎる声も。"}else{up(8,4);m="アク禁！ 荒らしは消えた。"}}}
+m+=`<br><span class="sm">${T.n}${pe?"（"+pe.tr.n+"タイプ）":""}：${T.tip}</span>`}
+else{if(a=="del"){p.del=1;up(-1,-6);m="ふつうの住民のレスを消してしまった…"}else if(a=="warn"){up(0,-4);m="無実の住民に警告してしまった。"}else{G.ban[p.id]=1;up(-3,-10);m="無実の住民をアク禁にしてしまった！"}}
+if(a!="ok")p.rp=0;
+G.box=G.box.filter(x=>!(x.t=="r"&&x.th==ti&&x.no==no));G.ev.push(`管理人がスレ「${th.t}」の>>${no}(${p.nm.split("◆")[0]})に「${{del:"削除",warn:"警告",ban:"アク禁(ID規制)",ok:"通報却下"}[a]}」を実行。相手は${T?T.n:"普通の住民"}`);G.ev=G.ev.slice(-8);sv();lg(m);draw()}
+function comp(i,j){const x=G.box[i],o=x.c.o[j];up(o[1],o[2]);G.box.splice(i,1);G.ev.push(`管理人が住民の要望「${x.c.t}」に「${o[0]}」と対応`);sv();lg(`「${o[0]}」→ ${o[3]}`);draw()}
+function pr(p,th,menu){const o=menu&&!p.me&&V.op==th.id+"@"+p.no,bn=G.ban[p.id];
+return `<div class="rs${p.rp?" fl":""}"><div class="hd"><span class="no" tabindex="0" role="button" data-g="op" data-x="${th.id}" data-y="${p.no}">${p.no}</span> ：<span class="nm"${p.ad?' style="color:var(--red)"':""}>${p.nm}</span>${p.hd?'<span class="sm">[自分・隠し]</span>':""}${p.sg?'<span class="sg">[sage]</span>':""}：${p.tm} ID:${p.id}${p.rp?" 🚩":""}${bn?" (規制中)":""}</div><div class="bd">${p.del?'<span class="gr">このレスは削除されました</span>':p.tx}</div>${o?`<div class="mn">${p.del?"":`<button data-g="a" data-x="del" data-y="${th.id}:${p.no}">削除</button><button data-g="a" data-x="warn" data-y="${th.id}:${p.no}">警告</button>`}<button data-g="a" data-x="ban" data-y="${th.id}:${p.no}">アク禁(ID)</button></div>`:""}</div>`}
+const bn=b=>BR.find(x=>x[0]==b)[1],tl=b=>G.th.filter(t=>t.b==b).sort((x,y)=>y.lt-x.lt||y.id-x.id);
+function draw(){
+$("#m1").className=G.o<30?"lo":"";$("#m2").className=G.s<30?"lo":"";
+$("#m1 u").style.width=G.o+"%";$("#m2 u").style.width=G.s+"%";$("#ai").textContent=AI?`AI：${aiBusy?"考え中…":"稼働中"}（待機${G.q.length}件）`:"AI：オフ（定型文モード）";$("#st").textContent=G.o<25?"荒廃":G.o<50?"不穏":G.o<75?"ふつう":"平和";
+const bx=G.box.filter(x=>x.t=="c"||G.th.find(t=>t.id==x.th));G.box=bx;
+$("#nav").innerHTML=`<a data-g="top">TOP</a> ｜ ${BR.map(b=>`<a data-g="b" data-x="${b[0]}">${b[1]}</a>`).join(" ｜ ")} ｜ <a data-g="box">通報ボックス(${bx.length})</a> ｜ <a data-g="eco">省エネ:${G.eco?"ON":"OFF"}</a> ｜ <a data-g="rs">リセット</a>`;
+let h="";
+if(V.p=="t"&&!G.th.find(t=>t.id==V.t))V={p:"top"};
+if(V.p=="top")h=`<div class="pn"><h2>AIちゃんねる 掲示板一覧</h2>${BR.map(b=>`<div class="th">■ <a data-g="b" data-x="${b[0]}">${b[1]}</a> <span class="sm">(${tl(b[0]).length}スレ ${tl(b[0]).reduce((a,t)=>a+t.ps.length,0)}レス)</span></div>`).join("")}<hr><p class="sm">スレを開いて荒らしを探そう。荒らしもスレ立てします。通報された書き込みには🚩が付き、通報ボックスに入ります。</p></div>`;
+else if(V.p=="b")h=`<div class="pn"><h2>${bn(V.b)}</h2><div class="sm">スレッド一覧（勢い順）</div><hr>${tl(V.b).map((t,i)=>`<div class="th">${i+1}: <a data-g="t" data-x="${t.id}">${t.t}</a> (${t.ps.length}) ${t.ps.some(p=>p.rp&&!p.del)?"🚩":""}</div>`).join("")}</div>`;
+else if(V.p=="t"){const t=G.th.find(t=>t.id==V.t);h=`<div class="pn"><div class="sm"><a data-g="b" data-x="${t.b}">${bn(t.b)}</a> ＞ スレ</div><h2>${t.t}</h2><hr>${t.ps.slice(-40).map(p=>pr(p,t,1)).join("")}</div>`}
+else h=`<div class="pn"><h2>通報ボックス</h2>${bx.length?bx.map((x,i)=>{if(x.t=="c")return `<div class="bx"><div class="sm">住民からの要望</div>${x.c.t}<div class="mn" style="margin-left:0">${x.c.o.map((o,j)=>`<button data-g="c" data-x="${i}" data-y="${j}">${o[0]}</button>`).join("")}</div></div>`;
+const[th,p]=fp(x.th,x.no);return `<div class="bx"><div class="sm">通報：「${x.w}」 ／ ${th.t}</div>${pr(p,th,0)}<div class="mn" style="margin-left:0">${p.del?"":`<button data-g="a" data-x="del" data-y="${th.id}:${p.no}">削除</button><button data-g="a" data-x="warn" data-y="${th.id}:${p.no}">警告</button>`}<button data-g="a" data-x="ban" data-y="${th.id}:${p.no}">アク禁</button><button data-g="a" data-x="ok" data-y="${th.id}:${p.no}">却下</button></div></div>`}).join(""):'<p class="sm">通報はありません。</p>'}</div>`;
+$("#v").innerHTML=h;$("#cp").hidden=!(V.p=="t"||V.p=="b");$("#cpt").hidden=V.p!="b";$("#cpx").placeholder=V.p=="b"?"最初のレス本文（この板に新スレを立てます）":"このスレに書き込む";$("#cph").textContent=V.p=="b"?"新スレを立てる":"このスレに書き込む"}
+function end(){clearInterval(iv);$("#cp").hidden=1;const a=(G.o+G.s)/2,l=G.o<=0?["板が荒らしに占拠された…","スレは荒れ放題。住民は別の板へ流れていった。"]:G.s<=0?["住民が全員移住した…","不満が限界を超え、板は過疎の果てに閉鎖された。"]:a>=80?["伝説の管理人","荒らしも住民も、あなたの手のひらの上。"]:a>=60?["名管理人","適度に荒れ、適度に笑える、いい板になった。"]:["ギリギリ管理人","板は生き残った。ただ、住民の目は冷たい。"];
+const bd=Object.keys(G.ban).length;
+$("#v").innerHTML=`<div class="pn c"><h2>${l[0]}</h2><p>${l[1]}</p><p>治安 ${Math.round(G.o)}／満足度 ${Math.round(G.s)}／規制ID ${bd}</p><button id="rt">もう一度やる</button></div>`;$("#rt").onclick=start}
+document.addEventListener("click",e=>{const el=e.target.closest("[data-g]");if(!el||!G)return;const g=el.dataset.g,x=el.dataset.x,y=el.dataset.y;
+if(g=="top")V={p:"top"};else if(g=="b")V={p:"b",b:x};else if(g=="t")V={p:"t",t:x};else if(g=="box")V={p:"box"};else if(g=="eco"){G.eco=!G.eco;sv();lg(G.eco?"省エネモード ON：AIの呼び出しを減らし、定型文を増やします。":"省エネモード OFF：AIがフル稼働します。")}else if(g=="rs"){if(G.rs){try{localStorage.removeItem(K)}catch(e){}start()}else{G.rs=1;lg("もう一度「リセット」を押すと最初からやり直します。");setTimeout(()=>{if(G)G.rs=0},4000)}return}
+else if(g=="op"){const k=x+"@"+y;V.op=V.op==k?null:k}
+else if(g=="a"){const[a,b]=y.split(":");return act(x,a,+b)}else if(g=="c")return comp(+x,+y);else if(g=="mp")return mypost(x=="h");
+draw()});
+document.addEventListener("keydown",e=>{if(e.key=="Enter"&&e.target.dataset?.g=="op")e.target.click()});
+let sd=null;try{sd=localStorage.getItem(K)}catch(e){}
+$("#v").innerHTML=`<div class="pn c"><h2>管理人になる</h2><p style="text-align:left">掲示板はずっと続きます。ふつうの書き込みに混ざった荒らし12タイプ（各6人）を自分で見つけてください。レス番号をタップで管理メニュー（削除・警告・アク禁）。通報とクレームは<b>通報ボックス</b>に届きます。スレや板を開くと下に書き込み欄が出て、管理人名義でも、名無しに隠れても書き込めます（住民が返信してきます）。進行は自動セーブされます。</p><p style="text-align:left" class="sm">住民と荒らしの書き込みはAIがその場で考えます（初回は許可の確認が出ます）。使えない場合は定型文で動きます。</p>${sd?'<button id="ct">続きから</button> ':""}<button id="go">${sd?"最初から":"開始"}</button></div>`;
+$("#nav").innerHTML="";$("#go").onclick=start;if($("#ct"))$("#ct").onclick=cont;
+</script></body></html>
